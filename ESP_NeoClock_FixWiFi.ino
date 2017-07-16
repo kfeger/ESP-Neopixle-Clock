@@ -63,7 +63,6 @@ byte HourC = 64, MinC = 64, SecC = 64;
 byte hourval, minuteval, secondval;
 bool TimeUpdate = false;
 
-
 //time_t getNtpTime();
 void digitalClockDisplay();
 void printDigits(int digits);
@@ -90,8 +89,8 @@ time_t utc, local;
 uint32_t LastSync = 0, NextSync = 0;
 
 
-const char ssid[] = "smuldom";       //  your network SSID (name)
-const char pass[] = "dresdener str 33a";       // your network password
+const char ssid[] = "xxxxxxxx";       //  your network SSID (name)
+const char pass[] = "yyyyyyyy";       // your network password
 
 /* Don't hardwire the IP address or we won't get the benefits of the pool.
     Lookup the IP address for the host name instead */
