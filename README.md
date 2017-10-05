@@ -9,4 +9,6 @@ Syncs to NTP
 
 Sets the LED brightness on sunrise and sundown (Timelord.h)
 
-Adjust your timezone and your wifi parameters to your needs.
+Adjust your timezone to your needs.
+
+WiFi ist configured via WiFiManager
