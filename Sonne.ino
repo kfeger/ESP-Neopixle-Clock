@@ -4,7 +4,7 @@ void SunUpDown (void) {
     Heute[0] = 0; Heute[1] = 0; Heute[2] = 12; Heute[3] = day(); Heute[4] = month(); Heute[5] = year() - 2000; // store today's date (at noon) in an array for TimeLord to use
     int JetztZeit = hour() * 60 + minute();
     int SonneAufZeit, SonneUnterZeit;
-    if (Dresden.SunRise(Heute)) {
+    if (City.SunRise(Heute)) {
       if (LTZ.locIsDST(now())) {
         Heute[tl_hour] += 1;
         Serial.print("Sommer, ");
@@ -17,7 +17,7 @@ void SunUpDown (void) {
       Serial.println();
       SonneAufZeit = Heute[tl_hour] * 60 + Heute[tl_minute];
     }
-    if (Dresden.SunSet(Heute)) {
+    if (City.SunSet(Heute)) {
       if (LTZ.locIsDST(now())) {
         Heute[tl_hour] += 1;
         Serial.print("Sommer, ");
