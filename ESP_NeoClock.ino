@@ -65,19 +65,19 @@
 
 //Stunden hell
 #define HOUR_C   0x400000
-#define HOUR_CL  0x0B0000
-#define HOUR_CLL 0x030000
+#define HOUR_CL  0x080000
+#define HOUR_CLL 0x010000
 //Stunden dunkel
 #define DARK_HOUR_C   0x0B0000
-#define DARK_HOUR_CL  0x040000
-#define DARK_HOUR_CLL 0x020000
+#define DARK_HOUR_CL  0x010000
+#define DARK_HOUR_CLL 0x010000
 
 //Minuten hell
-#define MIN_C  0x1800
-#define MIN_CL 0x0500
+#define MIN_C  0x1a00
+#define MIN_CL 0x0200
 //Minuten dunkel
-#define DARK_MIN_C  0x0400
-#define DARK_MIN_CL 0x0200
+#define DARK_MIN_C  0x0600
+#define DARK_MIN_CL 0x0100
 
 //Sekunden hell
 #define SEC_C      0x60
@@ -102,18 +102,20 @@
 #ifdef ESP12
 int NeoPin = 14;
 #define HOSTNAME "NeoPixel12Clock"
-#define AP_NAME "NeoPixel12AP"
+#define AP_NAME "NeoPixel-Uhr"
 #else
 int NeoPin = 3; //eigentlich Rx-Pin, mal sehen...
 #define HOSTNAME "NeoPixel01Clock"
-#define AP_NAME "NeoPixel01AP"
+#define AP_NAME "NeoPixel-Uhr"
 #endif
 
 int NeoLength = 60;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NeoLength, NeoPin, NEO_GRB + NEO_KHZ800);
 
 SSD1306  display(0x3c, 0, 2); //ESP-01, SDA = 0, SCLK = 2
-#define TIME_POS 64,0
+#define LOC_POS 64, 0
+#define LOC1_POS  64, 20
+#define TIME_POS 64, 0
 #define SYNC_POS 64, 52
 
 
@@ -129,11 +131,11 @@ uint32_t PrevColor = 0;
 byte HourC = 64, MinC = 64, SecC = 64;
 byte hourval, minuteval, secondval;
 bool TimeUpdate = false;
-
+tmElements_t Ts;
 
 //time_t getNtpTime();
-void digitalClockDisplay();
-void printDigits(int digits);
+//void digitalClockDisplay();
+//void printDigits(int digits);
 //void sendNTPpacket(IPAddress &address);
 
 // what is our longitude (west values negative) and latitude (south values negative)
@@ -163,6 +165,8 @@ byte Heute[6];
 byte PreDay = 0;
 bool SonneDa = true;
 bool PreSonneDa = false;
+time_t TempTime = 0;
+bool SyncFail = false;
 
 // local time zone definition
 // Central European Time (Frankfurt, Paris) from Timezone/examples/WorldClock/WorldClock.pde
@@ -198,7 +202,6 @@ void setup() {
 #pragma message "Mit OLED-Display"
   display.init();
   display.flipScreenVertically();
-  display.clear();
   display.clear();
 #else
 #pragma message "Ohne OLED-Display"
@@ -238,20 +241,22 @@ void setup() {
   delay(1000);
   display.clear();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.setFont(ArialMT_Plain_16);
+  display.drawString(LOC_POS, "Standort ist");
   display.setFont(Droid_Sans_Bold_36);
 #if defined DD
-  display.drawString(TIME_POS, "ottO");
+  display.drawString(LOC1_POS, "ottO");
 #elif defined HB
-  display.drawString(TIME_POS, "Manni.42");
+  display.drawString(LOC1_POS, "Manni.42");
 #elif defined WW
-  display.drawString(TIME_POS, "Silke");
+  display.drawString(LOC1_POS, "Silke");
 #elif defined KO
-  display.drawString(TIME_POS, "Sarah");
+  display.drawString(LOC1_POS, "Sarah");
 #else
-  display.drawString(TIME_POS, "Fehler");
+  display.drawString(LOC1_POS, "Fehler");
 #endif
   display.display();
-  delay(1000);
+  delay(2000);
 #endif
   delay(2000);
 
@@ -265,8 +270,8 @@ void setup() {
   Serial.print("Local port: ");
   Serial.println(udp.localPort());
   Serial.println(F("Hole NTP-Zeit"));
-  setSyncProvider(getNTPTime);
-  //setTime(getNTPTime());
+  //setSyncProvider(getNTPTime);
+  setTime(getNTPTime());
   if (timeStatus() != timeSet) {
     Serial.println("Uhr nicht mit NTP synchronisiert");
     while (1); //wdt provozieren
@@ -275,6 +280,9 @@ void setup() {
     Serial.println("NTP hat die Systemzeit gesetzt");
   LastSync = now();
   NextSync = now() + NEXT_SYNC;
+  breakTime(NextSync, Ts);
+  Ts.Second = 30;
+  NextSync = makeTime(Ts);
   PrintSync(NextSync);
   ClearStrip();
   SunUpDown();
@@ -292,12 +300,18 @@ time_t prevDisplay = 0; // when the digital clock was displayed
 
 void loop() {
   if (now() >= NextSync) {
-    setTime(getNTPTime());
+    TempTime = getNTPTime();
+    if (TempTime >= now()) {
+      setTime(TempTime);
+      SyncFail = false;
+    }
+    else
+      SyncFail = true;
     NextSync = now() + NEXT_SYNC;
     NewSync = true;
-
-    //NextSync auf hh:mm:30 setzen
-    //NextSync = (hour(TempSync) * 3600) + (minute(TempSync) * 60) + 30;
+    breakTime(NextSync, Ts);
+    Ts.Second = 30;
+    NextSync = makeTime(Ts);
     PrintSync(NextSync);
     Serial.print(now());
     Serial.print(" ");

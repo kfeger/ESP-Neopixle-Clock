@@ -1,13 +1,4 @@
 
-//Wird gerufen,wenn das bisherige WLAN
-//nicht mehr vorhanden ist
-void configModeCallback (WiFiManager *ThisWiFiManager) {
-  Serial.println("Entered config mode");
-  Serial.println(WiFi.softAPIP());
-  //Serial.println(WiFi.softAP(ssid));
-  //if you used auto generated SSID, print it
-  Serial.println(ThisWiFiManager->getConfigPortalSSID());
-}
 
 void ClearStrip(void) {
   for (int i = 0; i < 60; i++) {
@@ -286,15 +277,11 @@ void SetHands(void) {
 void SetMarker (byte slow) {
   int i;
   long Marker, DMarker;
-  if (((NextSync - now()) > 600)) {  //0...2999 seit NTP-sync
+  if (((NextSync - now()) > 270)) {  //0...2999 seit NTP-sync
     Marker = MARK_C_0;
     DMarker = DARK_MARK_C_0;
   }
-  else if (((NextSync - now()) <= 600) && ((NextSync - now()) > 300)) { //3000...3299 seit NTP-sync, gelblich
-    Marker = MARK0_C;
-    DMarker = DARK_MARK0_C;
-  }
-  else if (((NextSync - now()) <= 300) && ((NextSync - now()) > 100)) { //3300...3499 seit NTP-sync, lila-lich
+  else if (((NextSync - now()) <= 270) && ((NextSync - now()) > 30)) { //3300...3499 seit NTP-sync, lila-lich
     Marker = MARK1_C;
     DMarker = DARK_MARK1_C;
   }

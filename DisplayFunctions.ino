@@ -16,7 +16,10 @@ void drawTime(void) {
   display.drawString(TIME_POS, TimeString);
 
   display.setFont(Droid_Sans_12);
-  TimeString = "NTP-Sync um ";
+  if (SyncFail)
+    TimeString = "Fehler! Neu um ";
+  else
+    TimeString = "NTP-Sync um ";
   if (hour(NextSync) < 10)
     TimeString += "0" + String(hour(NextSync));
   else
@@ -31,6 +34,19 @@ void drawTime(void) {
     TimeString += ":" + String(second(NextSync));
   display.drawString(SYNC_POS, TimeString);
   display.display();
+#endif
+}
+
+void drawWiFiMessage (String ThisSSID) {
+#if defined WITH_OLED
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.setFont(Droid_Sans_16);
+  display.drawString(64, 0, "Bitte WLAN über");
+  display.drawString(64, 20, ThisSSID);
+  display.drawString(64, 40, "konfigurieren");
+  display.display();
+
 #endif
 }
 

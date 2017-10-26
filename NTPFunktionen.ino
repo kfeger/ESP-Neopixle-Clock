@@ -1,3 +1,16 @@
+//Wird gerufen,wenn das bisherige WLAN
+//nicht mehr vorhanden ist
+void configModeCallback (WiFiManager *ThisWiFiManager) {
+  String WiFiSSID = "";
+  Serial.println("Entered config mode");
+  Serial.println(WiFi.softAPIP());
+  WiFiSSID = ThisWiFiManager->getConfigPortalSSID();
+//  Serial.println(ThisWiFiManager->getConfigPortalSSID());
+    Serial.println(WiFiSSID);
+  drawWiFiMessage(WiFiSSID);
+}
+
+
 /*-------- NTP code ----------*/
 /*
 
