@@ -15,6 +15,8 @@ WiFi ist configured via WiFiManager
 
 Danke für diese Libraries:
 
+https://github.com/esp8266/Arduino
+
 https://github.com/PaulStoffregen/Time
 
 https://github.com/JChristensen/Timezone
