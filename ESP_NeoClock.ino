@@ -23,6 +23,29 @@
    "#define ESP-12 1" unkommentieren.
  * */
 
+/*
+   Compiler-Seuerung
+*/
+
+//OLED-Display
+#define WITH_OLED 1
+
+//Orte....
+#define DD 1    //ottO
+//#define HB 1  //Manni
+//#define WW 1    //Silke
+//#define KO 1  //Sarah
+
+//Plattform
+//#define ESP12 1
+
+//LED-Ring-Typ
+#define CW_RING 1
+
+/*
+   Ende Compiler-Steuerung
+*/
+
 #include <TimeLib.h>  //https://github.com/PaulStoffregen/Time
 #include <Timezone.h> //https://github.com/JChristensen/Timezone
 #include <TimeLord.h> //https://github.com/probonopd/TimeLord
@@ -35,31 +58,11 @@
 #include <WiFiManager.h>  //https://github.com/tzapu/WiFiManager
 #include <Wire.h>
 #include "images.h"
-#include "SSD1306.h"
+#ifdef WITH_OLED
+  #include "SSD1306.h"  //https://github.com/ThingPulse/esp8266-oled-ssd1306
+#endif
 #include "fonts.h"
 
-/*
-   Compiler-Seuerung
-*/
-
-//Orte....
-#define DD 1    //ottO
-//#define HB 1  //Manni
-//#define WW 1    //Silke
-//#define KO 1  //Sarah
-
-//Plattform
-//#define ESP12 1
-
-//OLED-Display
-#define WITH_OLED 1
-
-//LED-Ring-Typ
-#define CW_RING 1
-
-/*
-   Ende Compiler-Steuerung
-*/
 
 #define NEXT_SYNC 3600  //1h zwischen Sync
 
@@ -112,7 +115,10 @@ int NeoPin = 3; //eigentlich Rx-Pin, mal sehen...
 int NeoLength = 60;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NeoLength, NeoPin, NEO_GRB + NEO_KHZ800);
 
-SSD1306  display(0x3c, 0, 2); //ESP-01, SDA = 0, SCLK = 2
+#ifdef WITH_OLED
+  SSD1306  display(0x3c, 0, 2); //ESP-01, SDA = 0, SCLK = 2
+#endif
+
 #define LOC_POS 64, 0
 #define LOC1_POS  64, 20
 #define TIME_POS 64, 0
@@ -354,4 +360,3 @@ void printDigits(int digits) {
     Serial.print('0');
   Serial.print(digits);
 }
-
